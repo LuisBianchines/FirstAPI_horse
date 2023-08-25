@@ -11,6 +11,7 @@ object HorseAPI: THorseAPI
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
   PixelsPerInch = 96
   TextHeight = 13
   object btIniciar: TButton
@@ -26,5 +27,18 @@ object HorseAPI: THorseAPI
     Font.Style = []
     ParentFont = False
     TabOrder = 0
+    OnClick = btIniciarClick
+  end
+  object Conexao: TFDConnection
+    Params.Strings = (
+      'Database=precisao'
+      'User_Name=sa'
+      'Password=masterkey'
+      'Server=PC48'
+      'DriverID=MSSQL')
+    Connected = True
+    LoginPrompt = False
+    Left = 312
+    Top = 40
   end
 end

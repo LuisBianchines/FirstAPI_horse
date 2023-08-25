@@ -18,6 +18,7 @@ type
     procedure Gerar(Req : THorseRequest; Res: THorseResponse);
     procedure btIniciarClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Selecionar(Req : THorseRequest; Res: THorseResponse);
   private
     { Private declarations }
   public
@@ -55,7 +56,7 @@ procedure THorseAPI.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
      if Horse.IsRunning then     
         Horse.StopListen;
-     
+
 end;
 
 procedure THorseAPI.Gerar(Req : THorseRequest; Res: THorseResponse);
@@ -63,7 +64,6 @@ var
    xArrayContent : TJSONArray;
    xJSONContent : TJSONObject;
    xQry : TFDQUery;
-   i : Integer;
 begin
      try
         try
@@ -79,21 +79,74 @@ begin
                           +' COD_DEPARTAMENTO, '
                           +' EMAIL '
                           +' from csenha ');
+
             xQry.Open;
             xQry.First;
             while not xQry.Eof do
             begin
                 xJSONContent := TJSONObject.Create;
-                xJSONContent.AddPair('id', i.ToString);
+                xJSONContent.AddPair('id', xQry.FieldByName('codigo').AsInteger.ToString);
                 xJSONContent.AddPair('cod_empresa', xQry.FieldByName('cod_empresa').AsInteger.ToString);
-                xJSONContent.AddPair('codigo', xQry.FieldByName('codigo').AsInteger.ToString);
                 xJSONContent.AddPair('nome', xQry.FieldByName('nome').AsString);
                 xJSONContent.AddPair('cod_departamento', xQry.FieldByName('cod_departamento').AsInteger.ToString);
                 xJSONContent.AddPair('email', xQry.FieldByName('email').AsString);
 
                 xArrayContent.AddElement(xJSONContent);
 
-                Inc(i);
+                xQry.Next;
+            end;
+
+            Res.Send(xArrayContent.ToJSON).ContentType('application/json').Status(THTTPStatus.OK);
+
+        except on E: Exception do
+            begin
+                 Res.Send(E.Message).Status(THTTPStatus.BadRequest);
+            end;
+        end;
+     finally
+            if Assigned(xQry) then
+               FreeAndNil(xQry);
+
+            if Assigned(xArrayContent) then
+               FreeAndNil(xArrayContent);
+     end;
+end;
+
+procedure THorseAPI.Selecionar(Req : THorseRequest; Res: THorseResponse);
+var
+   xArrayContent : TJSONArray;
+   xJSONContent : TJSONObject;
+   xQry : TFDQUery;
+begin
+     try
+        try
+            xQry := TFDQuery.Create(nil);
+
+            xArrayContent := TJSONArray.Create;
+
+            xQry.Connection := Conexao;
+            xQry.SQL.Add(' select '
+                          +' COD_EMPRESA, '
+                          +' CODIGO, '
+                          +' NOME, '
+                          +' COD_DEPARTAMENTO, '
+                          +' EMAIL '
+                          +' from csenha '
+                          +' where codigo = ' + Req.Params.Field('id').AsString);
+
+            xQry.Open;
+            xQry.First;
+            while not xQry.Eof do
+            begin
+                xJSONContent := TJSONObject.Create;
+                xJSONContent.AddPair('id', xQry.FieldByName('codigo').AsInteger.ToString);
+                xJSONContent.AddPair('cod_empresa', xQry.FieldByName('cod_empresa').AsInteger.ToString);
+                xJSONContent.AddPair('nome', xQry.FieldByName('nome').AsString);
+                xJSONContent.AddPair('cod_departamento', xQry.FieldByName('cod_departamento').AsInteger.ToString);
+                xJSONContent.AddPair('email', xQry.FieldByName('email').AsString);
+
+                xArrayContent.AddElement(xJSONContent);
+
                 xQry.Next;
             end;
 
@@ -120,6 +173,7 @@ begin
          Horse := THorse.Create;
          Horse.Use(CORS);
          Horse.Use(Compression());
+         Horse.Get('/selecionar/:id', Selecionar);
          Horse.Get('/listar', Gerar);
          Horse.Listen(9000);
     end;
