@@ -9,6 +9,22 @@
 			"artifacts": {},
 			"failed": false,
 			"changed": false
+		},
+		"github.com/hashload/horse-compression": {
+			"name": "horse-compression",
+			"version": "1.1.11",
+			"hash": "d23ea9e74fe0eb9ebf20970c5878f17b",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"github.com/hashload/horse-cors": {
+			"name": "horse-cors",
+			"version": "1.0.6",
+			"hash": "544456143eca0709bd9793b1fa04cb69",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
 		}
 	}
 }

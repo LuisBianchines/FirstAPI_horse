@@ -8,7 +8,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, FireDAC.DApt,
-  Data.DB, FireDAC.Comp.Client, Horse.Core;
+  Data.DB, FireDAC.Comp.Client, Horse.Core, Horse.CORS, Horse.Compression;
 
 type
   THorseAPI = class(TForm)
@@ -17,6 +17,7 @@ type
     procedure Registry;
     procedure Gerar(Req : THorseRequest; Res: THorseResponse);
     procedure btIniciarClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -26,6 +27,7 @@ type
 var
   HorseAPI: THorseAPI;
   status : Boolean = False;
+  Horse : THorse;
 
 implementation
 
@@ -47,6 +49,13 @@ begin
      btIniciar.Caption := 'Parar';
 
      status := True;
+end;
+
+procedure THorseAPI.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+     if Horse.IsRunning then     
+        Horse.StopListen;
+     
 end;
 
 procedure THorseAPI.Gerar(Req : THorseRequest; Res: THorseResponse);
@@ -106,8 +115,14 @@ end;
 
 procedure THorseAPI.Registry;
 begin
-     THorse.Get('/listar', Gerar);
-     THorse.Listen(9000);
+    if not Assigned(Horse) then
+    begin
+         Horse := THorse.Create;
+         Horse.Use(CORS);
+         Horse.Use(Compression());
+         Horse.Get('/listar', Gerar);
+         Horse.Listen(9000);
+    end;
 end;
 
 end.
