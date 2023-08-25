@@ -8,7 +8,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, FireDAC.DApt,
-  Data.DB, FireDAC.Comp.Client, Horse.Core;
+  Data.DB, FireDAC.Comp.Client, Horse.Core, Horse.CORS, Horse.Compression;
 
 type
   THorseAPI = class(TForm)
@@ -53,7 +53,9 @@ end;
 
 procedure THorseAPI.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-     Horse.StopListen;
+     if Horse.IsRunning then     
+        Horse.StopListen;
+     
 end;
 
 procedure THorseAPI.Gerar(Req : THorseRequest; Res: THorseResponse);
@@ -61,7 +63,6 @@ var
    xArrayContent : TJSONArray;
    xJSONContent : TJSONObject;
    xQry : TFDQUery;
-   i : Integer;
 begin
      try
         try
@@ -77,21 +78,20 @@ begin
                           +' COD_DEPARTAMENTO, '
                           +' EMAIL '
                           +' from csenha ');
+
             xQry.Open;
             xQry.First;
             while not xQry.Eof do
             begin
                 xJSONContent := TJSONObject.Create;
-                xJSONContent.AddPair('id', i.ToString);
+                xJSONContent.AddPair('id', xQry.FieldByName('codigo').AsInteger.ToString);
                 xJSONContent.AddPair('cod_empresa', xQry.FieldByName('cod_empresa').AsInteger.ToString);
-                xJSONContent.AddPair('codigo', xQry.FieldByName('codigo').AsInteger.ToString);
                 xJSONContent.AddPair('nome', xQry.FieldByName('nome').AsString);
                 xJSONContent.AddPair('cod_departamento', xQry.FieldByName('cod_departamento').AsInteger.ToString);
                 xJSONContent.AddPair('email', xQry.FieldByName('email').AsString);
 
                 xArrayContent.AddElement(xJSONContent);
 
-                Inc(i);
                 xQry.Next;
             end;
 
@@ -113,8 +113,15 @@ end;
 
 procedure THorseAPI.Registry;
 begin
-     Horse.Get('/listar', Gerar);
-     Horse.Listen(9000);
+    if not Assigned(Horse) then
+    begin
+         Horse := THorse.Create;
+         Horse.Use(CORS);
+         Horse.Use(Compression());
+         Horse.Get('/listar/:id', Gerar);
+         Horse.Get('/listar', Gerar);
+         Horse.Listen(9000);
+    end;
 end;
 
 end.

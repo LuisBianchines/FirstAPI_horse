@@ -17,6 +17,7 @@ type
     procedure Registry;
     procedure Gerar(Req : THorseRequest; Res: THorseResponse);
     procedure btIniciarClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -48,6 +49,13 @@ begin
      btIniciar.Caption := 'Parar';
 
      status := True;
+end;
+
+procedure THorseAPI.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+     if Horse.IsRunning then     
+        Horse.StopListen;
+     
 end;
 
 procedure THorseAPI.Gerar(Req : THorseRequest; Res: THorseResponse);
@@ -107,18 +115,14 @@ end;
 
 procedure THorseAPI.Registry;
 begin
-     try
-        Horse := THorse.Create;
-        Horse.Use(CORS);
-        Horse.Use(Compression());
-        Horse.Get('/listar', Gerar);
-        Horse.Listen(9000);
-     
-     finally
-       if Assigned(Horse) then
-          Horse.StopListen;
-          FreeAndNil(Horse);
-     end;
+    if not Assigned(Horse) then
+    begin
+         Horse := THorse.Create;
+         Horse.Use(CORS);
+         Horse.Use(Compression());
+         Horse.Get('/listar', Gerar);
+         Horse.Listen(9000);
+    end;
 end;
 
 end.
