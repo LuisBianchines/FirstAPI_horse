@@ -2,8 +2,8 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2023/08/25 08:25:15.000.027,=C:\Users\Luis\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2023/08/25 08:33:54.000.665,C:\Users\Luis\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\LUIS\Projeto_horse_luis\Samples.pas</Transaction>
-    <Transaction>2023/08/25 08:33:54.000.665,C:\Users\Luis\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\LUIS\Projeto_horse_luis\Samples.dfm</Transaction>
-    <Transaction>2023/08/25 08:34:14.000.521,C:\Users\Luis\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\LUIS\Projeto_horse_luis\PrjHorseLuis.dproj</Transaction>
+    <Transaction>2023/08/25 08:33:54.000.665,C:\LUIS\Projeto_horse_luis\Samples.dfm=C:\Users\Luis\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2023/08/25 08:33:54.000.665,C:\LUIS\Projeto_horse_luis\Samples.pas=C:\Users\Luis\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/08/25 08:34:14.000.521,C:\LUIS\Projeto_horse_luis\PrjHorseLuis.dproj=C:\Users\Luis\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
   </Transactions>
 </BorlandProject>

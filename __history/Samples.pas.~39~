@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Horse, System.JSON,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
-  FireDAC.Phys, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait,
+  FireDAC.Phys, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, FireDAC.DApt,
   Data.DB, FireDAC.Comp.Client, Horse.Core;
 
 type
@@ -17,6 +17,7 @@ type
     procedure Registry;
     procedure Gerar(Req : THorseRequest; Res: THorseResponse);
     procedure btIniciarClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -25,6 +26,8 @@ type
 
 var
   HorseAPI: THorseAPI;
+  status : Boolean = False;
+  Horse : THorse;
 
 implementation
 
@@ -37,6 +40,21 @@ implementation
 procedure THorseAPI.btIniciarClick(Sender: TObject);
 begin
      Registry;
+
+     if status then
+     begin
+          Close;
+     end;
+
+     btIniciar.Caption := 'Parar';
+
+     status := True;
+end;
+
+procedure THorseAPI.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+     Horse.StopListen;
+     FreeAndNil(Horse);
 end;
 
 procedure THorseAPI.Gerar(Req : THorseRequest; Res: THorseResponse);
@@ -89,9 +107,6 @@ begin
             if Assigned(xQry) then
                FreeAndNil(xQry);
 
-            if Assigned(xJSONContent) then
-               FreeAndNil(xJSONContent);
-
             if Assigned(xArrayContent) then
                FreeAndNil(xArrayContent);
      end;
@@ -99,8 +114,9 @@ end;
 
 procedure THorseAPI.Registry;
 begin
-     THorse.Get('/listar', Gerar);
-     THorse.Listen(9000);
+     Horse := THorse.Create;
+     Horse.Get('/listar', Gerar);
+     Horse.Listen(9000);
 end;
 
 end.

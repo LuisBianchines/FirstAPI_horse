@@ -1,11 +1,6 @@
 program PrjHorseLuis;
 
 uses
-  madExcept,
-  madLinkDisAsm,
-  madListHardware,
-  madListProcesses,
-  madListModules,
   Vcl.Forms,
   Samples in 'Samples.pas' {HorseAPI};
 
