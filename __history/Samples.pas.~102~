@@ -278,7 +278,6 @@ var
    xID: Integer;
    xJsonReq : TJSONValue;
    xNome, xFamilia, xUn, xCodInterno : string;
-   xQry : TFDQuery;
 begin
      try
         try
@@ -296,10 +295,10 @@ begin
             xJsonReq.TryGetValue('unidade', xUn);
 
             Conexao.ExecSQL(' update tproduto '
-                               +' set codigo_interno = ''' + xCodInterno +'''' 
-                               + ', nome = ''' + xNome +''''
-                               + ', familia = '''+ xFamilia +'''' 
-                               + ', unidade = '''+ xUn +''''
+                               +' set codigo_interno = ' + xCodInterno 
+                               + ', nome = ' + xNome 
+                               + ', familia = '+ xFamilia 
+                               + ', unidade = '+ xUn
                                + ' where cod_empresa = 1 and codigo = '+ xID.ToString);
 
             Res.Send(xJsonReq.ToJSON).ContentType('aplication/json').Status(THTTPStatus.OK);
@@ -327,7 +326,6 @@ begin
          Horse.Get('/produtos', Produtos);
          Horse.Delete('/delete/:id', Delete);
          Horse.Post('novo', Novo);
-         Horse.Put('update/:id', Update);
          Horse.Listen(9000);
     end;
 end;
