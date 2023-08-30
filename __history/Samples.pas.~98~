@@ -21,8 +21,6 @@ type
     procedure Buscar(Req : THorseRequest; Res: THorseResponse);
     procedure Novo(Req : THorseRequest; Res: THorseResponse);
     procedure Delete(Req : THorseRequest; Res: THorseResponse);
-    procedure Update(Req : THorseRequest; Res: THorseResponse);
-    
   private
     { Private declarations }
   public
@@ -159,8 +157,7 @@ begin
                           +' UNIDADE '
                           +' from tproduto'
                           +' where cod_empresa = 1 '
-                          +' and codigo >= 1700 '
-                          +' order by codigo desc');
+                          +' and codigo >= 1700 ');
 
             xQry.Open;
             xQry.First;
@@ -271,51 +268,6 @@ begin
      
 end;
 
-
-
-procedure THorseAPI.Update(Req: THorseRequest; Res: THorseResponse);
-var
-   xID: Integer;
-   xJsonReq : TJSONValue;
-   xNome, xFamilia, xUn, xCodInterno : string;
-   xQry : TFDQuery;
-begin
-     try
-        try
-            xID := Req.Params.Field('id').AsInteger;
-
-            xJsonReq := nil;
-            xJsonReq := TJSONObject.ParseJSONValue(Req.Body);
-            xNome := EmptyStr;
-            xJsonReq.TryGetValue('nome', xNome);
-            xCodInterno := EmptyStr;
-            xJsonReq.TryGetValue('codigo_interno', xCodInterno);
-            xFamilia := EmptyStr;
-            xJsonReq.TryGetValue('familia', xFamilia);
-            xUn := EmptyStr;
-            xJsonReq.TryGetValue('unidade', xUn);
-
-            Conexao.ExecSQL(' update tproduto '
-                               +' set codigo_interno = ''' + xCodInterno +'''' 
-                               + ', nome = ''' + xNome +''''
-                               + ', familia = '''+ xFamilia +'''' 
-                               + ', unidade = '''+ xUn +''''
-                               + ' where cod_empresa = 1 and codigo = '+ xID.ToString);
-
-            Res.Send(xJsonReq.ToJSON).ContentType('aplication/json').Status(THTTPStatus.OK);
-            
-        except on E: Exception do
-            begin
-                 Res.Send(E.Message).Status(THTTPStatus.BadRequest);
-            end;
-        end;
-        
-     finally
-        if Assigned(xJsonReq) then
-           FreeAndNil(xJsonReq);
-     end;
-end;
-
 procedure THorseAPI.Registry;
 begin
     if not Assigned(Horse) then
@@ -327,7 +279,6 @@ begin
          Horse.Get('/produtos', Produtos);
          Horse.Delete('/delete/:id', Delete);
          Horse.Post('novo', Novo);
-         Horse.Put('update/:id', Update);
          Horse.Listen(9000);
     end;
 end;
